@@ -1,4 +1,4 @@
-Shader "Hidden/Evan/SSMS PostProcess"
+Shader "Hidden/Evan/SSMS Post Process"
 {
 
 }
