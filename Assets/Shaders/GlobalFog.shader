@@ -25,6 +25,14 @@ Shader "Hidden/Evan/Global Fog Post Process"
             float4x4 unity_CameraInvProjection;
             float4x4 unity_CameraToWorld;
 
+            /* HEIGHT FOG VARIABlES SET FROM THE POSTPROCESSGLOBALFOGRENDERER */
+            float3 fogPlaneNormal;
+            float fogPlaneHeight;
+            float heightFogDensity;
+            float fogNormalDotCamera;
+            float k;
+            
+
             float4 Frag(VaryingsDefault i) : SV_Target
             {
                 float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
@@ -55,18 +63,10 @@ Shader "Hidden/Evan/Global Fog Post Process"
                 // good. now we can calculate half-space fog thanks to https://www.terathon.com/lengyel/Lengyel-UnifiedFog.pdf
                 float3 cameraWorldPosition = _WorldSpaceCameraPos;
 
-                float3 fogPlaneNormal = float3(0, 1, 0);    // for testing purposes I'm defining these variables here. these are constants equal for all the fragment shader
-                float fogPlaneHeight = 0.3;                   // ...
-                float fogNormalDotCamera = cameraWorldPosition.y - fogPlaneHeight;    // ...
-                float k = fogNormalDotCamera <= 0 ? 1 : 0;  // ... are we in the height fog volume or not?
-                
                 float fogNormalDotFragWorld = fragWorldPosition.y - fogPlaneHeight; // evaluated foreach frag
-                float fogNormalDotFragView = fragViewPosition.y;
+                float fogNormalDotFragV = dot(fogPlaneNormal, cameraWorldPosition - fogNormalDotFragWorld);
 
-                float c1 = k * (fogNormalDotFragWorld + fogNormalDotCamera);
-                float c2 = (1 - 2 * k) * fogNormalDotFragWorld;
-                float heightFogFactor = min(c2, 0);
-                heightFogFactor = -length(fragViewPosition * 0.03 /* to replace with height fog */) * (c1 - pow(heightFogFactor, 2) / abs(fogNormalDotFragView + 1.0e-5f));
+                float heightFogFactor = -(heightFogDensity / 2) * distanceFromCamera * (k * (fogNormalDotFragWorld + fogNormalDotCamera) - ( pow(min( (1 - 2 * k) * fogNormalDotFragWorld , 0), 2) / ( abs(fogNormalDotFragV) + 0.00001 ) ));
 
                 fogFactor -= heightFogFactor;
                 fogFactor = saturate(fogFactor);

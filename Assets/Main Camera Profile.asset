@@ -16,6 +16,18 @@ MonoBehaviour:
   enabled:
     overrideState: 1
     value: 1
+  globalFogColor:
+    overrideState: 1
+    value: {r: 0.4, g: 0.4, b: 0.4, a: 1}
+  globalFogDensity:
+    overrideState: 1
+    value: 0.09
+  heightFogHeight:
+    overrideState: 1
+    value: 1.88
+  heightFogDensity:
+    overrideState: 1
+    value: 0.04
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
