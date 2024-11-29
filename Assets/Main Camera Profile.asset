@@ -1,5 +1,21 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9151264550272172662
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7df6b55010a31542b8781d3bec67b05, type: 3}
+  m_Name: PostProcessSSMS
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
 --- !u!114 &-8401580897942642457
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -21,13 +37,22 @@ MonoBehaviour:
     value: {r: 0.4, g: 0.4, b: 0.4, a: 1}
   globalFogDensity:
     overrideState: 1
-    value: 0.09
+    value: 0.06
+  globalFogTint:
+    overrideState: 1
+    value: {r: 0.5943396, g: 0.45696867, b: 0.45696867, a: 1}
+  globalFogMaxDensity:
+    overrideState: 1
+    value: 1
+  energyLoss:
+    overrideState: 1
+    value: 0
   heightFogHeight:
     overrideState: 1
-    value: 1.88
+    value: 1.98
   heightFogDensity:
     overrideState: 1
-    value: 0.04
+    value: 0.14
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42,3 +67,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings:
   - {fileID: -8401580897942642457}
+  - {fileID: -9151264550272172662}

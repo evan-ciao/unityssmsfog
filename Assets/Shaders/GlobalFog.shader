@@ -25,13 +25,17 @@ Shader "Hidden/Evan/Global Fog Post Process"
             float4x4 unity_CameraInvProjection;
             float4x4 unity_CameraToWorld;
 
-            /* HEIGHT FOG VARIABlES SET FROM THE POSTPROCESSGLOBALFOGRENDERER */
+            /* HEIGHT FOG VARIABLES SET FROM THE POSTPROCESSGLOBALFOGRENDERER */
             float3 fogPlaneNormal;
             float fogPlaneHeight;
             float heightFogDensity;
             float fogNormalDotCamera;
             float k;
-            
+
+            /* PARAMETERS SET FROM THE POSTPROCESSGLOBALFOGRENDERER */
+            float4 globalFogTint;
+            float energyLoss;
+            float globalFogMaxDensity;
 
             float4 Frag(VaryingsDefault i) : SV_Target
             {
@@ -66,21 +70,17 @@ Shader "Hidden/Evan/Global Fog Post Process"
                 float fogNormalDotFragWorld = fragWorldPosition.y - fogPlaneHeight; // evaluated foreach frag
                 float fogNormalDotFragV = dot(fogPlaneNormal, cameraWorldPosition - fogNormalDotFragWorld);
 
-                float heightFogFactor = -(heightFogDensity / 2) * distanceFromCamera * (k * (fogNormalDotFragWorld + fogNormalDotCamera) - ( pow(min( (1 - 2 * k) * fogNormalDotFragWorld , 0), 2) / ( abs(fogNormalDotFragV) + 0.00001 ) ));
+                float heightFogFactor = -(heightFogDensity * distanceFromCamera) * (k * (fogNormalDotFragWorld + fogNormalDotCamera) - ( pow(min( (1 - 2 * k) * fogNormalDotFragWorld , 0), 2) / ( abs(fogNormalDotFragV + 0.00001) ) ));
 
                 fogFactor -= heightFogFactor;
                 fogFactor = saturate(fogFactor);
-
-                // original. to implement later
-                /*
-                half4 sceneColorDark = sceneColor * pow(fogFac, clamp(_EnLoss,0.001,100));
-                return lerp(unity_FogColor * half4(_FogTint.rgb,1), lerp(sceneColor, sceneColorDark, _MaxValue),  clamp(fogFac, 1 - _MaxValue ,1));
-                */
-                //return float4(fragWorldPosition, 1);
-
-                //return float4(i.texcoord, linearDepth, 1);
+                
                 //return heightFogFactor;
-                return lerp(unity_FogColor, color, fogFactor);
+
+                half4 colorDark = color * pow(fogFactor, clamp(energyLoss, 0.001, 100));
+                return lerp(unity_FogColor * half4(globalFogTint.rgb, 1), lerp(color, colorDark, globalFogMaxDensity), clamp(fogFactor, 1 - globalFogMaxDensity, 1));
+
+                //return lerp(unity_FogColor, color, fogFactor);
             }
 
             ENDHLSL
