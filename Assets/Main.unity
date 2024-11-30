@@ -411,7 +411,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: d0e9e533637a2cc4f950ffecf42d0a8c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5.6748767
+      value: 13.87
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: d0e9e533637a2cc4f950ffecf42d0a8c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -595,7 +595,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 100
+  far clip plane: 75
   field of view: 40
   orthographic: 0
   orthographic size: 5
@@ -622,13 +622,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1069774568}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.16779342, y: -0, z: -0, w: 0.9858222}
-  m_LocalPosition: {x: -0.33, y: 3.669, z: -2.05}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.33, y: 1.68, z: -2.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 19.319, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1069774572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,7 +707,11 @@ MonoBehaviour:
   m_BeforeStackBundles:
   - assemblyQualifiedName: Evan.PostProcessGlobalFog, Assembly-CSharp, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_AfterStackBundles: []
+  m_AfterStackBundles:
+  - assemblyQualifiedName: Evan.PostProcessSSMS, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  - assemblyQualifiedName: Evan.PostProcessTest, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1 &1417723632
 GameObject:
   m_ObjectHideFlags: 0

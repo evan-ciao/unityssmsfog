@@ -4,11 +4,19 @@
 TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
 float4 _MainTex_TexelSize;
 
-TEXTURE2D_SAMPLER2D(_BaseTex, sampler_BaseTex);
 TEXTURE2D_SAMPLER2D(_FogTex, sampler_FogTex);
+TEXTURE2D_SAMPLER2D(_BaseTex, sampler_BaseTex);
 
 float _SampleScale;
+
+float _Radius;
+float _Blend;
+
 float _BlurWeight;
+float4 _BlurTint;
+
+float3 _ResponseCurve;
+float _BrightnessThreshold;
 
 /* UTILITY FUNCTIONS */
 
@@ -87,7 +95,7 @@ float4 UpsampleFilter(float2 uv)
     frag += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.wy) * 2;
     frag += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.xy);
 
-    return frag * (1.0 / 16);
+    return frag * _BlurTint * (1.0 / 16);
 }
 
 /* FRAGMENT SHADERS */
@@ -98,16 +106,25 @@ float4 FragPrefilter(VaryingsDefault i)
     float3 offsets = _MainTex_TexelSize.xyx * float3(1, 1, 0);
 
     // adjacent pixels
-    float4 frag0 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
-    float4 frag1 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv - offsets.xz);
-    float4 frag2 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.xz);
-    float4 frag3 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv - offsets.zy);
-    float4 frag4 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.zy);
+    float4 frag0 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
+    float4 frag1 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord - offsets.xz);
+    float4 frag2 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord + offsets.xz);
+    float4 frag3 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord - offsets.zy);
+    float4 frag4 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord + offsets.zy);
 
-    float4 median = Median(Median(frag0, frag1, frag2), frag3, frag4);
+    float median = Median(Median(frag0, frag1, frag2), frag3, frag4);
+    median = 1 - median;
+
     float brightness = Brightness(median);
 
     // threshold adjustments
+    float responseQuantity = clamp(brightness - _ResponseCurve.x, 0, _ResponseCurve.y);
+    responseQuantity = _ResponseCurve.z * pow(responseQuantity, 2);
+
+    // apply brightness response curve
+    median *= max(responseQuantity, brightness - _BrightnessThreshold) / max(brightness, 1e-5);
+
+    return median;
 }
 
 float4 FragFirstDownsampler(VaryingsDefault i)
@@ -122,11 +139,9 @@ float4 FragSecondDownsampler(VaryingsDefault i)
 
 float4 FragUpsampler(VaryingsDefault i)
 {
-    // combine the base texture color (updated by PostProcessSSMS.cs) with the blurred original screen image
-    float4 base = SAMPLE_TEXTURE2D(_BaseTex, sampler_BaseTex, i.texcoord);
     float4 blur = UpsampleFilter(i.texcoord);
     
-    return (base + blur * (1 + _BlurWeight)) / (1 + (_BlurWeight * 0.735));
+    return (blur * (1 + _BlurWeight)) / (1 + (_BlurWeight * 0.735));
 }
 
 float4 FragCombiner(VaryingsDefault i)
@@ -136,6 +151,5 @@ float4 FragCombiner(VaryingsDefault i)
 
     float fog = SAMPLE_TEXTURE2D(_FogTex, sampler_FogTex, i.texcoord);
 
-    // to add radius, intensity
-    return lerp(base, blur * (1 / 1), clamp(fog, 0, 1));
+    return lerp(base, blur * (1 / _Radius), clamp(fog, 0, _Blend));
 }

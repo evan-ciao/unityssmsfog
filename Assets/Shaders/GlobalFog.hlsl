@@ -59,8 +59,10 @@ float4 FullscreenFogEffect(VaryingsDefault i)
     fogFactor -= heightFogFactor;
     fogFactor = saturate(fogFactor);
     
+    fogFactor = 1 - fogFactor;
+
     half4 colorDark = color * pow(fogFactor, clamp(energyLoss, 0.001, 100));
-    return lerp(unity_FogColor * half4(globalFogTint.rgb, 1), lerp(color, colorDark, globalFogMaxDensity), clamp(fogFactor, 1 - globalFogMaxDensity, 1));
+    return lerp(lerp(color, colorDark, globalFogMaxDensity), unity_FogColor * half4(globalFogTint.rgb, 1), clamp(fogFactor, 1 - globalFogMaxDensity, 1));
 }
 
 // used in the second pass (assign global fogTex)
@@ -90,6 +92,6 @@ float4 OnlyFogEffect(VaryingsDefault i)
 
     fogFactor -= heightFogFactor;
     fogFactor = saturate(fogFactor);
-    
-    return fogFactor;
+
+    return 1 - fogFactor;
 }

@@ -56,7 +56,7 @@ namespace Evan
 
             int fogBufferNameID = Shader.PropertyToID("_FogTex");
             context.command.GetTemporaryRT(fogBufferNameID, Screen.width, Screen.height, 0);
-
+            
             context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
             context.command.BlitFullscreenTriangle(context.source, fogBufferNameID, sheet, 1);
         }
