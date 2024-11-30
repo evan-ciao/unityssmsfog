@@ -14,9 +14,8 @@ Shader "Hidden/Evan/SSMS Post Process"
             #pragma fragment Frag
 
             float4 Frag(VaryingsDefault i) : SV_Target
-            {
-                half3 downsample = DownsampleAntiFlickerFilter(i.texcoord);
-                return float4(downsample.x, downsample.y, downsample.z, 1);
+            {                
+                return FragCombiner(i);
             }
 
             ENDHLSL
