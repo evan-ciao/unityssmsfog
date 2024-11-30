@@ -25,6 +25,20 @@ float4 Median(float4 a, float4 b, float4 c)
 /* DOWNSAMPLING FUNCTIONS */
 
 // 4x4 box blur
+float4 DownsampleFilter(float2 uv)
+{
+    float4 offsets = _MainTex_TexelSize.xyxy * float4(-1, -1, 1, 1);
+
+    float4 frag;
+    frag = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.xy);
+    frag += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.zy);
+    frag += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.xw);
+    frag += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + offsets.zw);
+
+    return frag * (1.0 / 4);
+}
+
+// 4x4 box blur with anti flicker
 float4 DownsampleAntiFlickerFilter(float2 uv)
 {
     // box blur works by averaging the neighbour pixels of the current pixel being drawn
@@ -96,14 +110,14 @@ float4 FragPrefilter(VaryingsDefault i)
     // threshold adjustments
 }
 
-float4 FragFirstDownsampler()
+float4 FragFirstDownsampler(VaryingsDefault i)
 {
-    
+    return DownsampleAntiFlickerFilter(i.texcoord);    
 }
 
-float4 FragSecondDownsampler()
+float4 FragSecondDownsampler(VaryingsDefault i)
 {
-
+    return DownsampleFilter(i.texcoord);
 }
 
 float4 FragUpsampler(VaryingsDefault i)
